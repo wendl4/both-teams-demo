@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic Football Club Picker</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+        }
+        #result {
+            margin-top: 20px;
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+        textarea {
+            width: 80%;
+            height: 100px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Dynamic Football Club Picker</h1>
+    <textarea id="clubList" placeholder="Enter football clubs, one per line..."></textarea><br>
+    <button id="startButton">Pick Two Clubs</button>
+    <div id="result"></div>
+
+    <script>
+        document.getElementById('startButton').addEventListener('click', function() {
+            const clubList = document.getElementById('clubList').value.trim().split('\\n').map(club => club.trim()).filter(club => club);
+            
+            if (clubList.length < 2) {
+                alert('Please enter at least 2 clubs.');
+                return;
+            }
+
+            fetch('/pick', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ clubs: clubList })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    alert(data.error);
+                } else {
+                    const resultDiv = document.getElementById('result');
+                    resultDiv.textContent = `Selected Clubs: ${data.clubs[0]} and ${data.clubs[1]}`;
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        });
+    </script>
+</body>
+</html>
